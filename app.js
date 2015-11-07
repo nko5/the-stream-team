@@ -17,8 +17,10 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
 
   if(x < 640 && x >= 0) {
     if(y < 640 && y >= 0){
-      if(ref < 512 && ref > 0){
-        var filePath = path.join(__dirname, 'data', 'ref-sets', req.params.x, req.params.y, req.params.ref+'.json');
+      if(ref < 512 && ref >= 0){
+        var filePath = path.join(__dirname, 'data', 'ref-sets', ''+x, ''+y, ref+'.json');
+
+        console.log('find', filePath);
 
         if(isPathGood[filePath] === undefined){
           try{
@@ -26,6 +28,7 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
             isPathGood[filePath] = true;
           }
           catch(err){
+            console.log(err);
             isPathGood[filePath] = false;
           }
         }

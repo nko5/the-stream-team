@@ -1,67 +1,98 @@
-pulse.ready(function(){
 
-  // The base engine object
-  var engine = new pulse.Engine({
-    gameWindow: 'gw',
-    size: {width: 800, height: 600}
-  });
+(function(){
 
-  //Create and Add a scene
-  var scene = new pulse.Scene();
-  engine.scenes.addScene(scene);
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
 
-  //Create and add a layer
-  var layer = new pulse.Layer();
-  layer.anchor = {x: 0, y: 0};
-  layer.position = {x: 0, y: 0};
-  scene.addLayer(layer);
+  var paletteDirections = {
+    left: document.getElementById('left'),
+    up: document.getElementById('up'),
+    ref: document.getElementById('ref'),
+    down: document.getElementById('down'),
+    right: document.getElementById('right')
+  }
 
-  //Create and add a background sprite
-  var bg = new pulse.Sprite({
-    src: 'img/bg.jpg'
-  });
-  bg.position = {x: 400, y: 300};
-  layer.addNode(bg);
-
-  //Create a sprite, using a spritesheet
-  //for its image
-  var dino =  new pulse.Sprite({
-    src: 'img/dino.png',
-    size: {width: 180, height: 89}
-  });
-  dino.position = {x: -125, y: 430};
-  layer.addNode(dino);
-
-  //Create and animation to animate our sprite
-  var animation = new pulse.AnimateAction({
-    name : 'Walking',
-    size : {width: 250, height: 124},
-    bounds : {x: 250, y: 124},
-    frames : [0,1,2,3,4,5,6,7],
-    frameRate : 8
-  });
-
-  dino.addAction(animation);
-  animation.start();
-
-  //Create a label for our text
-  var label = new pulse.CanvasLabel({
-    text: '', fontSize: 40
-  });
-  label.position = {x: 400, y: 300};
-  layer.addNode(label);
-
-  var loop = function(manager) {
-    //Move the dino
-    dino.move(4, 0);
-
-    //Wrap the dino when when runs off-screen
-    if(dino.position.x >= 950) {
-      dino.position.x = -125;
+  var clickDir = {
+    'up': {
+      x: 0,
+      y: -20
+    },
+    'right': {
+      x: 20,
+      y: 0
+    },
+    'down': {
+      x: 0,
+      y: 20
+    },
+    'left': {
+      x: -20,
+      y: 0
     }
-  };
+  }
 
-  engine.scenes.activateScene(scene);
-  engine.go(30, loop);
-});
 
+  var x = 30;
+  var y = 30;
+  var ref = 217;
+  var color = 'pink';
+
+  var get = function(url, cb){
+    var req = new XMLHttpRequest();
+    req.onload = function() {
+      if(req.status !== 200){
+        cb(new Error(req.response));
+      }
+      else{
+        cb(null, JSON.parse(req.response));
+      }
+    }
+
+    req.open('GET', url);
+    req.send();
+  }
+
+  var setColorPalette = function(){
+    get('/ref-sets/'+x+'/'+y+'/'+ref, function(err, data){
+      if(err){
+        alert(err.message);
+      }
+      else{
+
+        var lbls = ['up', 'right', 'down', 'left'];
+
+        lbls.forEach(function(lbl){
+          paletteDirections[lbl].innerHTML = '';
+          var content = data[lbl];
+          console.log(lbl, content.length);
+          content.forEach(function(channels){
+            var div = document.createElement('div');
+            var pickRef = channels[0];
+            var red = channels[1];
+            var green = channels[2];
+            var blue = channels[3];
+            var pickColor = 'rgb('+red+','+green+','+blue+')';
+            div.style.backgroundColor = pickColor;
+            div.onclick = function(){
+              x += clickDir[lbl]['x'];
+              y += clickDir[lbl]['y'];
+              color = pickColor;
+              ref = pickRef;
+              paint(x, y, pickColor);
+              setColorPalette();
+            }
+            paletteDirections[lbl].appendChild(div);
+          });
+        });
+      }
+    });
+  }
+
+  var paint = function(x, y, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, 20, 20);
+  }
+
+  console.log(paletteDirections);
+  setColorPalette();
+}());
