@@ -32,9 +32,9 @@
   }
 
 
-  var x = 30;
-  var y = 30;
-  var ref = 217;
+  var x = 320;
+  var y = 320;
+  var ref = 103;
   var color = 'pink';
 
   var get = function(url, cb){
@@ -53,7 +53,9 @@
   }
 
   var setColorPalette = function(){
-    get('/ref-sets/'+x+'/'+y+'/'+ref, function(err, data){
+    var xt = x / 20;
+    var yt = y / 20;
+    get('/ref-sets/'+xt+'/'+yt+'/'+ref, function(err, data){
       if(err){
         alert(err.message);
       }
@@ -74,11 +76,21 @@
             var pickColor = 'rgb('+red+','+green+','+blue+')';
             div.style.backgroundColor = pickColor;
             div.onclick = function(){
+              ctx.fillStyle = color;
+              ctx.fillRect(x, y, 20, 20);
+              ctx.strokeStyle = color;
+              ctx.strokeRect(x, y, 20, 20);
+
               x += clickDir[lbl]['x'];
               y += clickDir[lbl]['y'];
               color = pickColor;
               ref = pickRef;
-              paint(x, y, pickColor);
+
+              ctx.fillStyle = color;
+              ctx.fillRect(x, y, 20, 20);
+              ctx.strokeStyle = '#00ff00';
+              ctx.strokeRect(x, y, 20, 20);
+
               setColorPalette();
             }
             paletteDirections[lbl].appendChild(div);
@@ -86,11 +98,6 @@
         });
       }
     });
-  }
-
-  var paint = function(x, y, color){
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 20, 20);
   }
 
   console.log(paletteDirections);

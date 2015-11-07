@@ -5,6 +5,10 @@ var co = require('co');
 var path = require('path');
 var fs = require('fs');
 
+var BLOCK_SIZE = 20;
+var WIDTH = 640 / BLOCK_SIZE;
+var PIXELS_PER_BLOCK = BLOCK_SIZE * BLOCK_SIZE;
+
 
 var getBasePixels = function*(imgPath){
   return new Promise(function(accept, reject){
@@ -20,9 +24,28 @@ var getBasePixels = function*(imgPath){
 }
 
 var getPixel = function(img, x, y){
-  var red = img.get(x, y, 0) || 0;
-  var green = img.get(x, y, 1) || 0;
-  var blue = img.get(x, y, 2) || 0;
+  var red = 0;
+  var green = 0;
+  var blue = 0;
+
+  var xBase = x * BLOCK_SIZE;
+  var yBase = y * BLOCK_SIZE;
+
+  for(var xAdd=0; xAdd < BLOCK_SIZE; xAdd++){
+    for(var yAdd = 0; yAdd < BLOCK_SIZE; yAdd++){
+      var xPos = xBase + xAdd;
+      var yPos = yBase + yAdd;
+
+      red += (img.get(x, y, 0) || 0) / PIXELS_PER_BLOCK;
+      green += (img.get(x, y, 1) || 0) / PIXELS_PER_BLOCK;
+      blue += (img.get(x, y, 2) || 0) / PIXELS_PER_BLOCK;
+    }
+  }
+
+  red = Math.floor(red);
+  green = Math.floor(green);
+  blue = Math.floor(blue);
+
   var ref = Math.floor(red / 32) << 6 | Math.floor(green / 32) << 3 | Math.floor(blue / 32);
 
   return [ref, red, green, blue];
@@ -33,8 +56,8 @@ var getBlock = function(img, x, y){
   var out = {};
   out.ref = middle[0] + '';
   out.up = y-1 >= 0 && getPixel(img, x, y-1);
-  out.right = x+1 < 640 && getPixel(img, x-1, y);
-  out.down = y+1 < 640 && getPixel(img, x, y+1);
+  out.right = x+1 < WIDTH && getPixel(img, x-1, y);
+  out.down = y+1 < WIDTH && getPixel(img, x, y+1);
   out.left = x-1 >= 0 && getPixel(img, x-1, y);
 
   return out;
@@ -68,8 +91,8 @@ co(function*() {
 
   console.log('numImgs', numImgs);
 
-  for(var x=0; x<640; x++){
-    for(var y=0; y<640; y++){
+  for(var x=0; x<WIDTH; x++){
+    for(var y=0; y<WIDTH; y++){
 
       var data = {};
 
@@ -98,7 +121,7 @@ co(function*() {
 
       var diff = process.hrtime(start);
 
-      console.log('benchmark took %d nanoseconds', diff[0] * 1000 + (diff[1] / 10000));
+      console.log('benchmark took %d nanoseconds', diff[0] * 1e9 + diff[1]);
 
       console.log(x, y, 'added', refs.length);
     }
