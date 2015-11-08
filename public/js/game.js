@@ -55,18 +55,18 @@
     req.send();
   }
 
-  document.onkeydown = function(e){
-    console.log('a', e);
-  }
+  var canPress = false;
 
   var setColorPalette = function(){
+    canPress = false;
     var xt = x / 20;
     var yt = y / 20;
     get('/ref-sets/'+xt+'/'+yt+'/'+ref, function(err, data){
       if(err){
-        alert(err.message);
+        alert(':( -- we had an error');
       }
       else{
+        canPress = true;
 
         var lbls = ['up', 'right', 'down', 'left'];
 
@@ -84,18 +84,45 @@
 
         palette.innerHTML = '';
         var content = data[lbl];
+
+        var handles = [];
+
+        var redMax = 0;
+        var greenMax = 0;
+        var blueMax = 0;
+
+        content.map(function(channels){
+          channels.red = 1 / (channels[1] + channels[2] + channels[3]) * channels[1];
+          channels.green = 1 / (channels[1] + channels[2] + channels[3]) * channels[2];
+          channels.blue = 1 / (channels[1] + channels[2] + channels[3]) * channels[3];
+
+          redMax = redMax < channels.red ? channels.red : redMax;
+          greenMax = greenMax < channels.green ? channels.green : greenMax;
+          blueMax = blueMax < channels.blue ? channels.blue : blueMax;
+
+          return channels;
+        });
+
+        var redIndex = null;
+        var greenIndex = null;
+        var blueIndex = null;
+
         content.forEach(function(channels, i){
           var div = document.createElement('div');
-          div.innerText = i;
+          div.innerText = i <= 9 ? i : '';
           var pickRef = channels[0];
           var red = channels[1];
           var green = channels[2];
           var blue = channels[3];
           var pickColor = 'rgb('+red+','+green+','+blue+')';
           div.style.backgroundColor = pickColor;
-          div.onkeydown = function(e){
-          }
-          div.onclick = function(){
+
+          redIndex = channels.red === redMax ? i : redIndex;
+          greenIndex = channels.green === greenMax ? i : greenIndex;
+          blueIndex = channels.blue === blueMax ? i : blueIndex;
+
+          handles.push(function(){
+            canPress = false;
             ctx.fillStyle = color;
             ctx.fillRect(x, y, 20, 20);
             ctx.strokeStyle = color;
@@ -112,9 +139,27 @@
             ctx.strokeRect(x, y, 20, 20);
 
             setColorPalette();
-          }
+          });
+
           palette.appendChild(div);
         });
+
+        document.onkeydown = function(e){
+          if(canPress){
+            if(e.keyCode >= 48 && e.keyCode <= 57){
+              handles[e.keyCode - 48] && handles[e.keyCode - 48]();
+            }
+            else if(e.keyCode == 82) {
+              handles[redIndex]();
+            }
+            else if(e.keyCode == 71) {
+              handles[greenIndex]();
+            }
+            else if(e.keyCode == 66) {
+              handles[redIndex]();
+            }
+          }
+        }
       }
     });
   }

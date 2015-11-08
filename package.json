@@ -12,7 +12,8 @@
   },
   "scripts": {
     "start": "node app.js",
-    "postinstall": "node scripts/postinstall.js && npm run unpack",
-    "unpack": "if [[ $(ls ./data | grep ref-sets | wc -l) -eq 1 ]]; then tar -vxzf ./data/ref-sets.tar.gz -C ./data/; fi"
+    "postinstall": "node scripts/postinstall.js && npm run curl && npm run unpack",
+    "curl": "curl -s https://raw.githubusercontent.com/nko5/the-stream-team/35d7f425079e41c17560441c797592e9a6d5cd60/data/ref-sets.tar.gz > ./data/ref-sets.tar.gz",
+    "unpack": "tar -vxzf ./data/ref-sets.tar.gz -C ./data/"
   }
 }
