@@ -5,4 +5,5 @@ modulus-auto-zip-*
 __MACOSX/
 .DS_Store
 node_modules
-data/ref-sets
+data/ref-sets*
+data/imgs

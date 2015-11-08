@@ -16,21 +16,22 @@ canvas {
   float: left;
 }
 
-#game{
-  overflow: auto;
+#rules {
+  list-style: none;
   padding: 5px;
 }
 
+#about {
+
+}
+
 #palette {
-  position: absolute;
   background: #efefef;
   border-style: solid;
   border-width: 1px;
   border-color: #000000;
   width: 564px;
-  height: 564px;
-  top: 50px;
-  right: 10px;
+  float: right;
 }
 
 #palette > div {

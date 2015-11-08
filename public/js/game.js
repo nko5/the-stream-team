@@ -38,7 +38,7 @@
   var x = 320;
   var y = 320;
   var ref = 103;
-  var color = 'pink';
+  var color = 'white';
 
   var get = function(url, cb){
     var req = new XMLHttpRequest();
@@ -116,6 +116,10 @@
           var blue = channels[3];
           var pickColor = 'rgb('+red+','+green+','+blue+')';
           div.style.backgroundColor = pickColor;
+
+          div.onclick = function(){
+            handles[i]();
+          }
 
           redIndex = channels.red === redMax ? i : redIndex;
           greenIndex = channels.green === greenMax ? i : greenIndex;
