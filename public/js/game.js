@@ -1,8 +1,23 @@
 
 (function(){
 
+  var socket = io();
+
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
+
+  var background = new Image();
+  background.src = "/us-all.jpg";
+
+  background.onload = function(){
+    ctx.drawImage(background, 0, 0);
+  }
+
+  socket.on('back', function(msg){
+    console.log(msg);
+    ctx.fillStyle = msg.color;
+    ctx.fillRect(msg.x, msg.y, 20, 20);
+  });
 
   var palette = document.getElementById('palette');
 
@@ -64,6 +79,10 @@
     get('/ref-sets/'+xt+'/'+yt+'/'+ref, function(err, data){
       if(err){
         alert(':( -- we had an error');
+        x = 320;
+        y = 320;
+        ref = 103;
+        setColorPalette();
       }
       else{
         canPress = true;
@@ -92,9 +111,9 @@
         var blueMax = 0;
 
         content.map(function(channels){
-          channels.red = 1 / (channels[1] + channels[2] + channels[3]) * channels[1];
-          channels.green = 1 / (channels[1] + channels[2] + channels[3]) * channels[2];
-          channels.blue = 1 / (channels[1] + channels[2] + channels[3]) * channels[3];
+          channels.red = channels[1];
+          channels.green = channels[2];
+          channels.blue = channels[3];
 
           redMax = redMax < channels.red ? channels.red : redMax;
           greenMax = greenMax < channels.green ? channels.green : greenMax;
@@ -102,6 +121,10 @@
 
           return channels;
         });
+
+        content.sort(function(a, b){
+          return Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) + Math.abs(a[3] + b[3]);
+        })
 
         var redIndex = null;
         var greenIndex = null;
@@ -129,13 +152,17 @@
             canPress = false;
             ctx.fillStyle = color;
             ctx.fillRect(x, y, 20, 20);
-            ctx.strokeStyle = color;
-            ctx.strokeRect(x, y, 20, 20);
 
             x += clickDir[lbl]['x'];
             y += clickDir[lbl]['y'];
             color = pickColor;
             ref = pickRef;
+
+            socket.emit('color', {
+              x: x,
+              y: y,
+              color: color
+            });
 
             ctx.fillStyle = color;
             ctx.fillRect(x, y, 20, 20);

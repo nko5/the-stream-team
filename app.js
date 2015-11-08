@@ -1,7 +1,23 @@
 var express = require('express');
 var app = express();
+var http = require('http').Server(app);
 var fs = require('fs');
 var path = require('path');
+var io = require('socket.io')(http);
+var ndarray = require('ndarray');
+var savePixels = require('save-pixels');
+var imgs = require('./data/images.json');
+var imgIds = Object.keys(imgs);
+
+var pixels = ndarray([], [640, 640, 3]);
+
+for(var xp = 0; xp < 640; xp++){
+  for(var yp = 0; yp < 640; yp++){
+    pixels.set(xp, yp, 0, 255);
+    pixels.set(xp, yp, 1, 255);
+    pixels.set(xp, yp, 2, 255);
+  }
+}
 
 //Create a static file server
 app.configure(function() {
@@ -19,8 +35,6 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
     if(y < 640 && y >= 0){
       if(ref < 512 && ref >= 0){
         var filePath = path.join(__dirname, 'data', 'ref-sets', ''+x, ''+y, ref+'.json');
-
-        console.log('find', filePath);
 
         if(isPathGood[filePath] === undefined){
           try{
@@ -50,6 +64,43 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
 
 });
 
-var port = 8080;
-app.listen(port);
-console.log('Express server started on port %s', port);
+app.get('/us-all.jpg', function(req, res){
+  res.set('Content-Type', 'image/jpg');
+  savePixels(pixels, 'jpg').pipe(res);
+});
+
+app.get('/rando.jpg', function(req, res){
+  var request = require('request');
+  var imgId = imgIds[Math.floor(Math.random() * imgIds.length)];
+  res.set('Content-Type', 'image/jpg');
+  request(imgs[imgId]).pipe(res);
+})
+
+var rgb = function(r,g,b){
+  return [r, g, b];
+}
+
+var addColor = function(x, y, color){
+  var colors = eval(color);
+  for(var xAdd=0; xAdd<20; xAdd++){
+    for(var yAdd=0; yAdd<20; yAdd++){
+      pixels.set(x+xAdd, y+yAdd, 0, colors[0]);
+      pixels.set(x+xAdd, y+yAdd, 1, colors[1]);
+      pixels.set(x+xAdd, y+yAdd, 2, colors[2]);
+    }
+  }
+}
+
+io.on('connection', function(socket){
+  socket.on('color', function(msg){
+    console.log(msg);
+    io.emit('back', msg);
+    addColor(msg.x, msg.y, msg.color);
+  });
+});
+
+var port = process.env.PORT || 8080;
+http.listen(port, function(){
+  console.log('Express server started on port %s', port);
+});
+

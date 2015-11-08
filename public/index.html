@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html>
-  <title>Node Knockout 2015</title>
+  <title>Crowd Source Pixel Art Instagram Mashup</title>
   <head>
     <link rel='stylesheet' type='text/css' href='styles/main.css'>
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
   </head>
   <body>
     <div id='header'>
-      <h1>Pixel Art - Zoomed In</h1>
+      <h1>Crowd Source Pixel Art Instagram Mashup</h1>
     </div>
     <div id='game'>
       <canvas id='canvas' width='640' height='640'></canvas>
       <div id='about'>
-        <ul id='rules'>
-          <li> Keys 0-9 will select the numbered tile </li>
-          <li> r - will select the most red title</li>
-          <li> g - will select the most green title</li>
-          <li> b - will select the most blue title</li>
-          <li> Click works too </li>
-        </ul>
-        <div id='palette'></div>
+        <div>
+          <div id='palette'></div>
+          <h3>How to mash!</h3>
+          <ul id='rules'>
+            <li> Keys 0-9 will select the numbered tile </li>
+            <li> r - will select the most red title</li>
+            <li> g - will select the most green title</li>
+            <li> b - will select the most blue title</li>
+            <li> Click works too </li>
+          </ul>
+          <h3>About the game</h3>
+          <p>Lets make art by smashing <a href='https://github.com/nko5/the-stream-team/blob/master/data/images.json'>2000 instagram photos</a> together over the next month! I have a script scraping this image, so we will be able to see how it changes. <a href='https://twitter.com/mcwhittemore'>Message me on twitter (@mcwhittemore)</a> if you want to see the way the image changes</p>
+          <p>Share the most recent version with <a href='http://the-stream-team.2015.nodeknockout.com/us-all.jpg'>this link</a></p>
+          <p>vote for me in NKO<p>
+          <iframe src="http://nodeknockout.com/iframe/the-stream-team" frameborder=0 scrolling=no allowtransparency=true width=115 height=25>
+          </iframe>
+        </div>
+        <div>Sometimes you'll see an error message - my guess is there is an off by one error somewhere in the code. Tis a hackathon submissing so I won't have time to hunt that down! Fear not through, the masher will handle the error and recenter you on the board</div>
+        <div>Here is a random source image from instagram</div>
+        <img src='/rando.jpg' />
       </div>
     </div>
     <script type="text/javascript" src="js/game.js"></script>
