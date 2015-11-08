@@ -4,13 +4,7 @@
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
 
-  var paletteDirections = {
-    left: document.getElementById('left'),
-    up: document.getElementById('up'),
-    ref: document.getElementById('ref'),
-    down: document.getElementById('down'),
-    right: document.getElementById('right')
-  }
+  var palette = document.getElementById('palette');
 
   var clickDir = {
     'up': {
@@ -30,6 +24,15 @@
       y: 0
     }
   }
+
+  var back = {
+    'up': 'down',
+    'down': 'up',
+    'left': 'right',
+    'right': 'left'
+  }
+
+  var last = null;
 
 
   var x = 320;
@@ -52,6 +55,10 @@
     req.send();
   }
 
+  document.onkeydown = function(e){
+    console.log('a', e);
+  }
+
   var setColorPalette = function(){
     var xt = x / 20;
     var yt = y / 20;
@@ -63,43 +70,54 @@
 
         var lbls = ['up', 'right', 'down', 'left'];
 
-        lbls.forEach(function(lbl){
-          paletteDirections[lbl].innerHTML = '';
-          var content = data[lbl];
-          console.log(lbl, content.length);
-          content.forEach(function(channels){
-            var div = document.createElement('div');
-            var pickRef = channels[0];
-            var red = channels[1];
-            var green = channels[2];
-            var blue = channels[3];
-            var pickColor = 'rgb('+red+','+green+','+blue+')';
-            div.style.backgroundColor = pickColor;
-            div.onclick = function(){
-              ctx.fillStyle = color;
-              ctx.fillRect(x, y, 20, 20);
-              ctx.strokeStyle = color;
-              ctx.strokeRect(x, y, 20, 20);
+        lbls = lbls.filter(function(a){
+          if(a===last){
+            return false;
+          }
+          else {
+            return data[a].length > 0;
+          }
+        });
 
-              x += clickDir[lbl]['x'];
-              y += clickDir[lbl]['y'];
-              color = pickColor;
-              ref = pickRef;
+        var lbl = lbls[Math.floor(Math.random()*lbls.length)];
+        last = back[lbl];
 
-              ctx.fillStyle = color;
-              ctx.fillRect(x, y, 20, 20);
-              ctx.strokeStyle = '#00ff00';
-              ctx.strokeRect(x, y, 20, 20);
+        palette.innerHTML = '';
+        var content = data[lbl];
+        content.forEach(function(channels, i){
+          var div = document.createElement('div');
+          div.innerText = i;
+          var pickRef = channels[0];
+          var red = channels[1];
+          var green = channels[2];
+          var blue = channels[3];
+          var pickColor = 'rgb('+red+','+green+','+blue+')';
+          div.style.backgroundColor = pickColor;
+          div.onkeydown = function(e){
+          }
+          div.onclick = function(){
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 20, 20);
+            ctx.strokeStyle = color;
+            ctx.strokeRect(x, y, 20, 20);
 
-              setColorPalette();
-            }
-            paletteDirections[lbl].appendChild(div);
-          });
+            x += clickDir[lbl]['x'];
+            y += clickDir[lbl]['y'];
+            color = pickColor;
+            ref = pickRef;
+
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 20, 20);
+            ctx.strokeStyle = '#00ff00';
+            ctx.strokeRect(x, y, 20, 20);
+
+            setColorPalette();
+          }
+          palette.appendChild(div);
         });
       }
     });
   }
 
-  console.log(paletteDirections);
   setColorPalette();
 }());

@@ -33,54 +33,10 @@ canvas {
   right: 10px;
 }
 
-.colors > div {
-  width: 10px;
-  height: 10px;
-  float: left;
-}
-
-.colors {
-  padding: 20px;
-}
-
 #palette > div {
-  position: absolute;
-}
-
-#left {
-  left: 0px;
-  top: 135px;
-  height: 284px;
-  width: 100px;
-  background-color: pink;
-}
-
-#up {
-  top: 0px;
-  left: 110px;
-  width: 334px;
-  height: 125px;
-  background-color: white;
-}
-
-#right {
-  right: 0px;
-  top: 135px;
-  height: 284px;
-  width: 100px;
-  background-color: yellow;
-}
-
-#down {
-  bottom: 0px;
-  left: 110px;
-  width: 334px;
-  height: 125px;
-  background-color: green;
-}
-
-#ref {
-  top: 50px;
-  left: 50px;
-  background-color: black;
+  width: 40px;
+  height: 40px;
+  float: left;
+  margin: 5px;
+  text-align: center;
 }

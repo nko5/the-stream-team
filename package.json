@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js && npm run unpack",
+    "unpack": "if [[ $(ls ./data | grep ref-sets | wc -l) -eq 1 ]]; then tar -vxzf ./data/ref-sets.tar.gz -C ./data/; fi"
   }
 }
