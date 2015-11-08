@@ -52,7 +52,7 @@
 
   var x = 320;
   var y = 320;
-  var imgd = ctx.getImageData(x, y, 1, 1);
+  var imgd = (ctx.getImageData(x, y, 1, 1)).data;
   var ref = Math.floor(imgd[0] / 32) << 6 | Math.floor(imgd[1] / 32) << 3 | Math.floor(imgd[2] / 32);
   var color = 'white';
 
@@ -83,7 +83,7 @@
         x = 320;
         y = 320;
 
-        var imgd = ctx.getImageData(x, y, 1, 1);
+        var imgd = (ctx.getImageData(x, y, 1, 1)).data
 
         ref = Math.floor(imgd[0] / 32) << 6 | Math.floor(imgd[1] / 32) << 3 | Math.floor(imgd[2] / 32);
 
