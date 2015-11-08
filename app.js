@@ -26,37 +26,43 @@ app.configure(function() {
 
 var isPathGood = {};
 
+var isThisReady = false;
+
 app.get('/ref-sets/:x/:y/:ref', function(req, res){
   var x = parseInt(req.params.x);
   var y = parseInt(req.params.y);
   var ref = parseInt(req.params.ref);
 
-  if(x < 640 && x >= 0) {
-    if(y < 640 && y >= 0){
-      if(ref < 512 && ref >= 0){
-        var filePath = path.join(__dirname, 'data', 'ref-sets', ''+x, ''+y, ref+'.json');
+  if(isThisReady){
 
-        if(isPathGood[filePath] === undefined){
-          try{
-            fs.accessSync(filePath);
-            isPathGood[filePath] = true;
-          }
-          catch(err){
-            console.log(err);
-            isPathGood[filePath] = false;
-          }
-        }
+    if(x < 640 && x >= 0) {
+      if(y < 640 && y >= 0){
+        if(ref < 512 && ref >= 0){
+          var filePath = path.join(__dirname, 'data', 'ref-sets', ''+x, ''+y, ref+'.json');
 
-        if(isPathGood[filePath] === true){
-          res.status(200);
-          return fs.readFile(filePath, 'utf8', function(err, data){
-            var json = JSON.parse(data.toString());
-            res.json(json);
-          });
+          if(isPathGood[filePath] === undefined){
+            try{
+              fs.accessSync(filePath);
+              isPathGood[filePath] = true;
+            }
+            catch(err){
+              console.log(err);
+              isPathGood[filePath] = false;
+            }
+          }
+
+          if(isPathGood[filePath] === true){
+            res.status(200);
+            return fs.readFile(filePath, 'utf8', function(err, data){
+              var json = JSON.parse(data.toString());
+              res.json(json);
+            });
+          }
         }
       }
     }
   }
+
 
   res.status(404).json({
     'message': 'nope'
@@ -102,5 +108,12 @@ io.on('connection', function(socket){
 var port = process.env.PORT || 8080;
 http.listen(port, function(){
   console.log('Express server started on port %s', port);
+});
+
+require('child_process').exec('npm run curl && npm run unpack', {
+  cwd: __dirname
+}, function(){
+  console.log('loaded');
+  isThisReady = true;
 });
 
