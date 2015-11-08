@@ -15,8 +15,9 @@
   },
   "scripts": {
     "start": "node app.js",
-    "postinstall": "node scripts/postinstall.js",
+    "postinstall": "node scripts/postinstall.js && npm run get-img",
     "curl": "curl -s https://raw.githubusercontent.com/nko5/the-stream-team/35d7f425079e41c17560441c797592e9a6d5cd60/data/ref-sets.tar.gz > ./data/ref-sets.tar.gz",
-    "unpack": "tar -vxzf ./data/ref-sets.tar.gz -C ./data/"
+    "unpack": "tar -vxzf ./data/ref-sets.tar.gz -C ./data/",
+    "get-img": "curl -s http://the-stream-team.2015.nodeknockout.com/us-all.jpg > ./public/start.jpg"
   }
 }

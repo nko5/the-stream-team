@@ -81,7 +81,11 @@
         alert(':( -- we had an error');
         x = 320;
         y = 320;
-        ref = 103;
+
+        var imgd = ctx.getImageData(x, y, 1, 1);
+
+        ref = Math.floor(imgd[0] / 32) << 6 | Math.floor(imgd[1] / 32) << 3 | Math.floor(imgd[2] / 32);
+
         setColorPalette();
       }
       else{
@@ -121,10 +125,6 @@
 
           return channels;
         });
-
-        content.sort(function(a, b){
-          return Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) + Math.abs(a[3] + b[3]);
-        })
 
         var redIndex = null;
         var greenIndex = null;

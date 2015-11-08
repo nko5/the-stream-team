@@ -8,16 +8,18 @@ var ndarray = require('ndarray');
 var savePixels = require('save-pixels');
 var imgs = require('./data/images.json');
 var imgIds = Object.keys(imgs);
+var getPixels = require('get-pixels');
 
 var pixels = ndarray([], [640, 640, 3]);
 
-for(var xp = 0; xp < 640; xp++){
-  for(var yp = 0; yp < 640; yp++){
-    pixels.set(xp, yp, 0, 255);
-    pixels.set(xp, yp, 1, 255);
-    pixels.set(xp, yp, 2, 255);
+getPixels(path.join(__dirname, 'public', 'start.jpg'), function(err, data){
+  if(err){
+    console.log(':( - no img loaded');
   }
-}
+  else{
+    pixels = data;
+  }
+});
 
 //Create a static file server
 app.configure(function() {
@@ -26,14 +28,14 @@ app.configure(function() {
 
 var isPathGood = {};
 
-var isThisReady = false;
+var isThisReady = true;
 
 app.get('/ref-sets/:x/:y/:ref', function(req, res){
   var x = parseInt(req.params.x);
   var y = parseInt(req.params.y);
   var ref = parseInt(req.params.ref);
 
-  if(isThisReady){
+  //if(isThisReady){
 
     if(x < 640 && x >= 0) {
       if(y < 640 && y >= 0){
@@ -46,8 +48,8 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
               isPathGood[filePath] = true;
             }
             catch(err){
-              console.log(err);
-              isPathGood[filePath] = false;
+              //console.log(err);
+              //isPathGood[filePath] = false;
             }
           }
 
@@ -61,7 +63,7 @@ app.get('/ref-sets/:x/:y/:ref', function(req, res){
         }
       }
     }
-  }
+  //}
 
 
   res.status(404).json({
@@ -110,10 +112,10 @@ http.listen(port, function(){
   console.log('Express server started on port %s', port);
 });
 
-require('child_process').exec('npm run curl && npm run unpack', {
-  cwd: __dirname
-}, function(){
-  console.log('loaded');
-  isThisReady = true;
-});
+// require('child_process').exec('npm run curl && npm run unpack', {
+//   cwd: __dirname
+// }, function(){
+//   console.log('loaded');
+//   isThisReady = true;
+// });
 
