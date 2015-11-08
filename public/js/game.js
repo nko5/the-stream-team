@@ -115,6 +115,21 @@
         var greenMax = 0;
         var blueMax = 0;
 
+        content = content.reduce(function(v, channels){
+          for(var i=0; i<v.length; i++){
+            if(v[0] === channels[0]
+              && v[1] === channels[1]
+              && v[2] === channels[2]
+              && v[3] === channels[3]){
+              return v;
+            }
+          }
+
+          v.push(channels);
+
+          return v;
+        }, []);
+
         content.map(function(channels){
           channels.red = channels[1];
           channels.green = channels[2];
